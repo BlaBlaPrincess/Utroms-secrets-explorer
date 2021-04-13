@@ -71,6 +71,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
                 ProcessDirectory(dirPath);
             }
             
+            _processedDirectory.RemoveDuplicates();
             RiseUp();
         }
     }

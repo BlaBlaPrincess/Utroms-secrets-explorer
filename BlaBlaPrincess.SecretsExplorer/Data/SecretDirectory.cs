@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using BlaBlaPrincess.SecretsExplorer.Common;
 
 namespace BlaBlaPrincess.SecretsExplorer.Data
 {
@@ -37,6 +39,52 @@ namespace BlaBlaPrincess.SecretsExplorer.Data
             Name = name;
         }
 
+        private bool SecretExists(ISecret secret, IEnumerable<ISecret> collection)
+        {
+            var secrets = collection.Where(s => s.Equals(secret));
+            var enumerable = secrets as SecretDirectory[] ?? secrets.ToArray();
+            return enumerable.Any();
+        }
+
+        public void RemoveDuplicates()
+        {
+            var uniqueSecrets = new List<ISecret>();
+            var duplicates = new List<ISecret>();
+            var weightDistributions = new Dictionary<string, List<ISecret>>();
+            foreach (var secret in Children)
+            {
+                if (!SecretExists(secret, uniqueSecrets))
+                {
+                    uniqueSecrets.Add(secret);
+                    if (weightDistributions.TryGetValue(secret.Name, out var weights))
+                    {
+                        weights.Add(secret);
+                    }
+                    else
+                    {
+                        weightDistributions.Add(secret.Name, new List<ISecret>{secret});
+                    }
+                }
+                else
+                {
+                    duplicates.Add(secret);
+                }
+            }
+            foreach (var duplicate in duplicates)
+            {
+                Children.Remove(duplicate);
+            }
+            foreach (var collection in weightDistributions.Select(pair => pair.Value))
+            {
+                collection.Sort((x, y) => y.Weight.CompareTo(x.Weight));
+                var id = 0;
+                foreach (var secret in collection)
+                {
+                    secret.Name = PathHelper.AddIdentifier(secret.Name, id++);
+                }
+            }
+        }
+        
         public bool Equals(SecretDirectory directory)
         {
             return Name == directory.Name &&
