@@ -28,5 +28,10 @@ namespace BlaBlaPrincess.SecretsExplorer.Data
         {
             return HashCode.Combine(Weight);
         }
+
+        public override string ToString()
+        {
+            return $"{Name} {Weight}Kb";
+        }
     }
 }
