@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using BlaBlaPrincess.SecretsExplorer.Common;
 using BlaBlaPrincess.SecretsExplorer.Data;
 
@@ -6,8 +7,19 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
 {
     public class UtromsSecretsExplorer : ISecretsExplorer
     {
+        public bool SecretsExplored { get; private set; } = false;
+        
         private SecretDirectory _processedDirectory;
+        private string _info;
 
+        public string GetInfo()
+        {
+            return SecretsExplored
+                ? _info
+                : throw new InvalidOperationException(
+                    "ExploreSecrets method must be called before getting the information.");
+        }
+        
         public void ExploreSecrets()
         {
             var source = "./";
@@ -18,6 +30,9 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
         {
             _processedDirectory = new SecretDirectory("Utrom's secrets");
             ProcessDirectory(source);
+            _info = $"{_processedDirectory}\n\n" +
+                    $"Source folder: {source}";
+            SecretsExplored = true;
         }
 
         private void RiseUp()
