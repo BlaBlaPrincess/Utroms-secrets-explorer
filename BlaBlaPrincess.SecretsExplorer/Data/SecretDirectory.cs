@@ -52,5 +52,26 @@ namespace BlaBlaPrincess.SecretsExplorer.Data
         {
             return HashCode.Combine(Children, Parent);
         }
+
+        public override string ToString()
+        {
+            var result = string.Empty;
+
+            result += $"{Name} ({Weight}Kb)/\n";
+            foreach (var secret in Children)
+            {
+                if (result[^1] != '\n')
+                {
+                    result += '\n';
+                }
+                for (int i = 0; i <= Depth; i++)
+                {
+                    result += @"    ";
+                }
+                result += $"|- {secret}";
+            }
+
+            return result;
+        }
     }
 }
