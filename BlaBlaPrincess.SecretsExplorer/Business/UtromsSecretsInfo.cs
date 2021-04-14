@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BlaBlaPrincess.SecretsExplorer.Common;
 
 namespace BlaBlaPrincess.SecretsExplorer.Business
 {
@@ -19,38 +20,17 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             ZipFiles = new List<string>();
         }
 
-        private string ListToString(List<string> list, string singular, string plural)
-        {
-            var result = string.Empty;
-            switch (list.Count)
-            {
-                case 0:
-                    break;
-                case 1:
-                    result += $"{singular}: {list[0]}";
-                    break;
-                default:
-                    result += $"{plural}:";
-                    foreach (var s in list)
-                    {
-                        result += $"\n    {s}";
-                    }
-                    break;
-            }
-            return result;
-        }
-
         public override string ToString()
         {
             var result = $"{ExploredSecrets}\n\n" +
                          $"Source folder: {Source}";
             if (Destinations.Any())
             {
-                result += $"\n{ListToString(Destinations, "Destination folder", "Destination folders")}";
+                result += $"\n{CollectionHelper.CollectionToString(Destinations, "Destination folder", "Destination folders")}";
             }
             if (ZipFiles.Any())
             {
-                result += $"\n{ListToString(ZipFiles, "Zip file", "Zip files")}";
+                result += $"\n{CollectionHelper.CollectionToString(ZipFiles, "Zip file", "Zip files")}";
             }
             return result;
         }
