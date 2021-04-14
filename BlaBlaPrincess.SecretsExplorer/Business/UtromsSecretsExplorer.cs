@@ -142,9 +142,9 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
                 if (secret is SecretDirectory dir)
                 {
                     _processedDirectory = dir;
-                    var dirName = $"{dir.Name}/";
+                    var dirName = $"{Path.Combine(destinationRelativeToArchive, dir.Name)}/";
                     archive.CreateEntry(dirName);
-                    ZipDirectory(archive, destinationRelativeToArchive + dirName);
+                    ZipDirectory(archive, dirName);
                 }
                 else
                 {
