@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using BlaBlaPrincess.SecretsExplorer.Common;
 using BlaBlaPrincess.SecretsExplorer.Data;
 
@@ -35,6 +36,41 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             SecretsExplored = true;
         }
 
+        public void ExploreSecrets(string source, string destination, bool zip = false)
+        {
+            ExploreSecrets(source);
+            if (!zip)
+            {
+                SaveSecrets(destination);
+            }
+            else
+            {
+                ZipSecrets(destination);
+            }
+        }
+        
+        public void SaveSecrets(string destination)
+        {
+            if (!SecretsExplored)
+            {
+                throw new InvalidOperationException("ExploreSecrets method must be called before saving the data.");
+            }
+            SaveDirectory(destination);
+        }
+
+        public void ZipSecrets(string destination)
+        {
+            if (!SecretsExplored)
+            {
+                throw new InvalidOperationException("ExploreSecrets method must be called before zipping the data.");
+            }
+            Directory.CreateDirectory(destination);
+            var path = Path.Combine(destination, _processedDirectory.Name) + ".zip";
+            using var zipToOpen = new FileStream(path, FileMode.Create);
+            using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update);
+            ZipDirectory(archive, string.Empty);
+        }
+        
         private void RiseUp()
         {
             if (!_processedDirectory.IsRoot)
@@ -72,6 +108,49 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             }
             
             _processedDirectory.RemoveDuplicates();
+            RiseUp();
+        }
+
+        private void SaveDirectory(string destination)
+        {
+            var path = Path.Combine(destination, _processedDirectory.Name);
+            Directory.CreateDirectory(path);
+            foreach (var secret in _processedDirectory.Children)
+            {
+                if (secret is SecretDirectory dir)
+                {
+                    _processedDirectory = dir;
+                    SaveDirectory(path);
+                }
+                else
+                {
+                    var file = Path.Combine(path, secret.Name);
+                    using var sw = new StreamWriter(file);
+                    sw.Write($"{secret.Weight}Kb");
+                }
+            }
+            RiseUp();
+        }
+
+        private void ZipDirectory(ZipArchive archive, string destinationRelativeToArchive)
+        {
+            foreach (var secret in _processedDirectory.Children)
+            {
+                if (secret is SecretDirectory dir)
+                {
+                    _processedDirectory = dir;
+                    var dirName = $"{dir.Name}/";
+                    archive.CreateEntry(dirName);
+                    ZipDirectory(archive, destinationRelativeToArchive + dirName);
+                }
+                else
+                {
+                    var file = Path.Combine(destinationRelativeToArchive, secret.Name);
+                    var entry = archive.CreateEntry(file);
+                    using var sw = new StreamWriter(entry.Open());
+                    sw.Write($"{secret.Weight}Kb");
+                }
+            }
             RiseUp();
         }
     }
