@@ -11,9 +11,9 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
         public bool SecretsExplored { get; private set; } = false;
         
         private SecretDirectory _processedDirectory;
-        private string _info;
+        private UtromsSecretsInfo _info;
 
-        public string GetInfo()
+        public UtromsSecretsInfo GetInfo()
         {
             return SecretsExplored
                 ? _info
@@ -31,8 +31,9 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
         {
             _processedDirectory = new SecretDirectory("Utrom's secrets");
             ProcessDirectory(source);
-            _info = $"{_processedDirectory}\n\n" +
-                    $"Source folder: {source}";
+
+            _info = new UtromsSecretsInfo(_processedDirectory.ToString(),
+                PathHelper.UnifySeparator(Path.TrimEndingDirectorySeparator(source)));
             SecretsExplored = true;
         }
 
@@ -56,6 +57,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
                 throw new InvalidOperationException("ExploreSecrets method must be called before saving the data.");
             }
             SaveDirectory(destination);
+            _info.Destinations.Add(PathHelper.UnifySeparator(Path.Combine(destination, _processedDirectory.Name)));
         }
 
         public void ZipSecrets(string destination)
@@ -69,6 +71,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             using var zipToOpen = new FileStream(path, FileMode.Create);
             using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update);
             ZipDirectory(archive, string.Empty);
+            _info.ZipFiles.Add(PathHelper.UnifySeparator(path));
         }
         
         private void RiseUp()
