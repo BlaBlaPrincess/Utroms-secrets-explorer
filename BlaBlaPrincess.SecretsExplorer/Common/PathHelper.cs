@@ -31,5 +31,10 @@ namespace BlaBlaPrincess.SecretsExplorer.Common
             var name = Path.GetFileNameWithoutExtension(Path.TrimEndingDirectorySeparator(path));
             return RenameFile(path, $"{name} ({id}){ex}");
         }
+
+        public static string UnifySeparator(string path)
+        {
+            return path.Replace("\\", "/");
+        }
     }
 }
