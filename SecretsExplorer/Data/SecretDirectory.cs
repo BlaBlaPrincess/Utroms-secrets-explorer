@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using BlaBlaPrincess.SecretsExplorer.Common;
 
@@ -95,7 +94,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Data
         public bool Equals(SecretDirectory directory)
         {
             return Name == directory.Name &&
-                   Children.SequenceEqual(directory.Children);
+                   EnumerableHelper.ScrambledEquals(Children, directory.Children);
         }
 
         public override bool Equals(object obj)
