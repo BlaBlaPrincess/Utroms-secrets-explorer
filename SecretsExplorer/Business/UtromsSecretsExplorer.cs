@@ -8,7 +8,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
 {
     public class UtromsSecretsExplorer : ISecretsExplorer
     {
-        public bool SecretsExplored => _currentDirectory is null;
+        public bool SecretsExplored => _currentDirectory is not null;
         
         private SecretDirectory _currentDirectory;
         private UtromsSecretsInfo _info;
