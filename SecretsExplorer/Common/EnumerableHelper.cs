@@ -26,5 +26,36 @@ namespace BlaBlaPrincess.SecretsExplorer.Common
             }
             return result;
         }
+        
+        public static bool HashMapEquals<T>(IEnumerable<T> enumerable1, IEnumerable<T> enumerable2)
+        {
+            var counter = new Dictionary<T, int>();
+            
+            foreach (var item in enumerable1)
+            {
+                if (counter.ContainsKey(item))
+                {
+                    counter[item]++;
+                }
+                else
+                {
+                    counter.Add(item, 1);
+                }
+            }
+            
+            foreach (var item in enumerable2)
+            {
+                if (counter.ContainsKey(item))
+                {
+                    counter[item]--;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            
+            return counter.Values.All(count => count == 0);
+        }
     }
 }
