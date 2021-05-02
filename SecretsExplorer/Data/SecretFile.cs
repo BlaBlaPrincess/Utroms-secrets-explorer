@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BlaBlaPrincess.SecretsExplorer.Data
+﻿namespace BlaBlaPrincess.SecretsExplorer.Data
 {
     public class SecretFile : ISecret
     {
@@ -26,7 +24,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Data
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Weight);
+            return base.GetHashCode();
         }
 
         public override string ToString()
