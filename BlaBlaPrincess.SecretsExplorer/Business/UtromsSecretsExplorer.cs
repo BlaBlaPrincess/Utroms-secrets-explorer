@@ -8,7 +8,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
 {
     public class UtromsSecretsExplorer : ISecretsExplorer
     {
-        public bool SecretsExplored { get; private set; } = false;
+        public bool SecretsExplored => _processedDirectory is null;
         
         private SecretDirectory _processedDirectory;
         private UtromsSecretsInfo _info;
@@ -34,7 +34,6 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
 
             _info = new UtromsSecretsInfo(_processedDirectory.ToString(),
                 PathHelper.UnifySeparator(Path.TrimEndingDirectorySeparator(source)));
-            SecretsExplored = true;
         }
 
         public void ExploreSecrets(string source, string destination, bool zip = false)
@@ -50,22 +49,14 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             }
         }
         
-        public void SaveSecrets(string destination)
+        private void SaveSecrets(string destination)
         {
-            if (!SecretsExplored)
-            {
-                throw new InvalidOperationException("ExploreSecrets method must be called before saving the data.");
-            }
             SaveDirectory(destination);
             _info.Destinations.Add(PathHelper.UnifySeparator(Path.Combine(destination, _processedDirectory.Name)));
         }
 
-        public void ZipSecrets(string destination)
+        private void ZipSecrets(string destination)
         {
-            if (!SecretsExplored)
-            {
-                throw new InvalidOperationException("ExploreSecrets method must be called before zipping the data.");
-            }
             Directory.CreateDirectory(destination);
             var path = Path.Combine(destination, _processedDirectory.Name) + ".zip";
             using var zipToOpen = new FileStream(path, FileMode.Create);
