@@ -57,5 +57,41 @@ namespace BlaBlaPrincess.SecretsExplorer.Common
             
             return counter.Values.All(count => count == 0);
         }
+
+        public static bool ScrambledEquals<T>(IEnumerable<T> enumerable1, IEnumerable<T> enumerable2)
+        {
+            var collection1 = enumerable1.ToList();
+            var collection2 = enumerable2.ToList();
+            
+            if (collection1.Count != collection2.Count) return false;
+
+            while (collection1.Count != 0)
+            {
+                var matchFound = false;
+                var index = 0;
+                foreach (var item in collection2)
+                {
+                    if (collection1[0].Equals(item))
+                    {
+                        matchFound = true;
+                        break;
+                    }
+                    
+                    index++;
+                }
+
+                if (matchFound)
+                {
+                    collection1.RemoveAt(0);
+                    collection2.RemoveAt(index);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
