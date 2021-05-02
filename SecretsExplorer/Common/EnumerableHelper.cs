@@ -3,17 +3,18 @@ using System.Linq;
 
 namespace BlaBlaPrincess.SecretsExplorer.Common
 {
-    public static class CollectionHelper
+    public static class EnumerableHelper
     {
-        public static string CollectionToString(ICollection<string> collection, string singular, string plural)
+        public static string EnumerableToString(IEnumerable<string> enumerable, string singular, string plural)
         {
             var result = string.Empty;
-            switch (collection.Count)
+            var collection = enumerable as string[] ?? enumerable.ToArray();
+            switch (collection.Length)
             {
                 case 0:
                     break;
                 case 1:
-                    result += $"{singular}: {collection.First()}";
+                    result += $"{singular}: {collection[0]}";
                     break;
                 default:
                     result += $"{plural}:";

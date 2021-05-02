@@ -26,11 +26,11 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
                          $"Source folder: {Source}";
             if (Destinations.Any())
             {
-                result += $"\n{CollectionHelper.CollectionToString(Destinations, "Destination folder", "Destination folders")}";
+                result += $"\n{EnumerableHelper.EnumerableToString(Destinations, "Destination folder", "Destination folders")}";
             }
             if (ZipFiles.Any())
             {
-                result += $"\n{CollectionHelper.CollectionToString(ZipFiles, "Zip file", "Zip files")}";
+                result += $"\n{EnumerableHelper.EnumerableToString(ZipFiles, "Zip file", "Zip files")}";
             }
             return result;
         }
