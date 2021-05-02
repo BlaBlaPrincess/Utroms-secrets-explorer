@@ -50,20 +50,11 @@ namespace BlaBlaPrincess.SecretsExplorer.Data
         {
             var uniqueSecrets = new List<ISecret>();
             var duplicates = new List<ISecret>();
-            var weightDistributions = new Dictionary<string, List<ISecret>>();
             foreach (var secret in Children)
             {
                 if (!SecretExists(secret, uniqueSecrets))
                 {
                     uniqueSecrets.Add(secret);
-                    if (weightDistributions.TryGetValue(secret.Name, out var weights))
-                    {
-                        weights.Add(secret);
-                    }
-                    else
-                    {
-                        weightDistributions.Add(secret.Name, new List<ISecret>{secret});
-                    }
                 }
                 else
                 {
@@ -73,6 +64,22 @@ namespace BlaBlaPrincess.SecretsExplorer.Data
             foreach (var duplicate in duplicates)
             {
                 Children.Remove(duplicate);
+            }
+        }
+
+        public void SetUniqueNames()
+        {
+            var weightDistributions = new Dictionary<string, List<ISecret>>();
+            foreach (var secret in Children)
+            {
+                if (weightDistributions.TryGetValue(secret.Name, out var weights))
+                {
+                    weights.Add(secret);
+                }
+                else
+                {
+                    weightDistributions.Add(secret.Name, new List<ISecret>{secret});
+                }
             }
             foreach (var collection in weightDistributions.Select(pair => pair.Value))
             {

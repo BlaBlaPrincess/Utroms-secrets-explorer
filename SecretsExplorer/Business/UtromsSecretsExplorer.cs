@@ -102,6 +102,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             }
             
             _processedDirectory.RemoveDuplicates();
+            _processedDirectory.SetUniqueNames();
             RiseUp();
         }
 
