@@ -76,7 +76,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
         private string GetSecretName(string path)
         {
             var name = PathHelper.GetFileOrDirectoryName(path);
-            UuidHelper.TryToRemoveUuids(name, out name);
+            UuidHelper.TryToRemoveUuid(name, out name);
             return name;
         }
 
