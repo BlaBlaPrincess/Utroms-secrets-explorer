@@ -13,7 +13,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Common
             var match = Regex.Match(input, pattern);
             if (match.Success)
             {
-                result = match.Value;
+                result = input.Replace(match.Value, string.Empty);
                 return true;
             }
             return false;
