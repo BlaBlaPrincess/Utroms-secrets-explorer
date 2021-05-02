@@ -8,9 +8,9 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
 {
     public class UtromsSecretsExplorer : ISecretsExplorer
     {
-        public bool SecretsExplored => _processedDirectory is null;
+        public bool SecretsExplored => _currentDirectory is null;
         
-        private SecretDirectory _processedDirectory;
+        private SecretDirectory _currentDirectory;
         private UtromsSecretsInfo _info;
 
         public UtromsSecretsInfo GetInfo()
@@ -29,10 +29,10 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
 
         public void ExploreSecrets(string source)
         {
-            _processedDirectory = new SecretDirectory("Utrom's secrets");
-            ProcessDirectory(source);
+            _currentDirectory = new SecretDirectory("Utrom's secrets");
+            ExploreCurrentDirectory(source);
 
-            _info = new UtromsSecretsInfo(_processedDirectory.ToString(),
+            _info = new UtromsSecretsInfo(_currentDirectory.ToString(),
                 PathHelper.UnifySeparator(Path.TrimEndingDirectorySeparator(source)));
         }
 
@@ -51,25 +51,25 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
         
         private void SaveSecrets(string destination)
         {
-            SaveDirectory(destination);
-            _info.Destinations.Add(PathHelper.UnifySeparator(Path.Combine(destination, _processedDirectory.Name)));
+            SaveCurrentDirectory(destination);
+            _info.Destinations.Add(PathHelper.UnifySeparator(Path.Combine(destination, _currentDirectory.Name)));
         }
 
         private void ZipSecrets(string destination)
         {
             Directory.CreateDirectory(destination);
-            var path = Path.Combine(destination, _processedDirectory.Name) + ".zip";
+            var path = Path.Combine(destination, _currentDirectory.Name) + ".zip";
             using var zipToOpen = new FileStream(path, FileMode.Create);
             using var archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update);
-            ZipDirectory(archive, string.Empty);
+            ZipCurrentDirectory(archive, string.Empty);
             _info.ZipFiles.Add(PathHelper.UnifySeparator(path));
         }
         
         private void RiseUp()
         {
-            if (!_processedDirectory.IsRoot)
+            if (!_currentDirectory.IsRoot)
             {
-                _processedDirectory = _processedDirectory.Parent;
+                _currentDirectory = _currentDirectory.Parent;
             }
         }
 
@@ -80,7 +80,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             return name;
         }
 
-        private void ProcessDirectory(string source)
+        private void ExploreCurrentDirectory(string source)
         {
             var files = Directory.GetFiles(source);
             foreach (var filePath in files)
@@ -88,34 +88,34 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
                 var name = GetSecretName(filePath);
                 var weight = UtromsSecretSizeHelper.GetSecretSize(filePath);
                 var secret = new SecretFile(name, weight);
-                _processedDirectory.Children.Add(secret);
+                _currentDirectory.Children.Add(secret);
             }
 
             var dirs = Directory.GetDirectories(source);
             foreach (var dirPath in dirs)
             {
                 var name = GetSecretName(dirPath);
-                var dir = new SecretDirectory(name, _processedDirectory);
-                _processedDirectory.Children.Add(dir);
-                _processedDirectory = dir;
-                ProcessDirectory(dirPath);
+                var dir = new SecretDirectory(name, _currentDirectory);
+                _currentDirectory.Children.Add(dir);
+                _currentDirectory = dir;
+                ExploreCurrentDirectory(dirPath);
             }
             
-            _processedDirectory.RemoveDuplicates();
-            _processedDirectory.SetUniqueNames();
+            _currentDirectory.RemoveDuplicates();
+            _currentDirectory.SetUniqueNames();
             RiseUp();
         }
 
-        private void SaveDirectory(string destination)
+        private void SaveCurrentDirectory(string destination)
         {
-            var path = Path.Combine(destination, _processedDirectory.Name);
+            var path = Path.Combine(destination, _currentDirectory.Name);
             Directory.CreateDirectory(path);
-            foreach (var secret in _processedDirectory.Children)
+            foreach (var secret in _currentDirectory.Children)
             {
                 if (secret is SecretDirectory dir)
                 {
-                    _processedDirectory = dir;
-                    SaveDirectory(path);
+                    _currentDirectory = dir;
+                    SaveCurrentDirectory(path);
                 }
                 else
                 {
@@ -127,16 +127,16 @@ namespace BlaBlaPrincess.SecretsExplorer.Business
             RiseUp();
         }
 
-        private void ZipDirectory(ZipArchive archive, string destinationRelativeToArchive)
+        private void ZipCurrentDirectory(ZipArchive archive, string destinationRelativeToArchive)
         {
-            foreach (var secret in _processedDirectory.Children)
+            foreach (var secret in _currentDirectory.Children)
             {
                 if (secret is SecretDirectory dir)
                 {
-                    _processedDirectory = dir;
+                    _currentDirectory = dir;
                     var dirName = $"{Path.Combine(destinationRelativeToArchive, dir.Name)}/";
                     archive.CreateEntry(dirName);
-                    ZipDirectory(archive, dirName);
+                    ZipCurrentDirectory(archive, dirName);
                 }
                 else
                 {
