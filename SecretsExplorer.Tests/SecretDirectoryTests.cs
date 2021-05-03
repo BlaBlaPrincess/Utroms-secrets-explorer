@@ -90,7 +90,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Tests
         }
         
         [Test]
-        public void GetHashCode_SameUnordered_Equal()
+        public void GetHashCode_Same_Equal()
         {
             SetupSameDirectories();
 
@@ -113,7 +113,7 @@ namespace BlaBlaPrincess.SecretsExplorer.Tests
         }
         
         [Test]
-        public void Equals_SameUnordered_Equal()
+        public void Equals_Same_Equal()
         {
             SetupSameDirectories();
             
